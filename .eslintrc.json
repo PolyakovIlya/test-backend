@@ -1,0 +1,10 @@
+{
+    "extends": "airbnb-base",
+    "rules": {
+        "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
+        "indent": ["error", 4],
+        "comma-dangle": ["error", "never"],
+        "consistent-return": ["error", { "treatUndefinedAsUnspecified": false }],
+        "import/no-dynamic-require": 0
+    }
+}
