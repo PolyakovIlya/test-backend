@@ -9,6 +9,10 @@ router.get('/', permission('admin'), (req, res, next) => {
         order: [['createdAt', 'DESC']]
     }).then((suggestions) => {
         res.json(suggestions);
+    }).catch((err) => {
+        const error = new Error(`Can't get all suggestions: ${err}`);
+        error.status = 403;
+        return next(error);
     });
 });
 
@@ -37,9 +41,29 @@ router.post('/', (req, res, next) => {
         status,
         ArticleId: articleId
     }).then((suggestion) => {
-        res.json({
-            suggestion
+        models.Article.findOne({
+            where: {
+                id: suggestion.ArticleId
+            }
+        }).then(article => {
+            if(article && status === 'approved') {
+                article.set(`paragraphs.${suggestion.paragraph_id}.paragraph`, suggestion.text);
+                article.save().then(() => {
+                    return res.json({
+                        status: 200,
+                        suggestion,
+                        message: 'Successfully created suggestion and article'
+                    });
+                })
+            } else {
+                return res.json({
+                    status: 200,
+                    suggestion,
+                    message: 'Successfully created suggestion'
+                });
+            }
         });
+
     }).catch((err) => {
         const error = new Error(`Can't create suggestion: ${err}`);
         error.status = 403;
@@ -92,23 +116,6 @@ router.put('/:id', permission('admin'), (req, res, next) => {
         });
 });
 
-
-router.put('/:id', permission('admin'), (req, res, next) => {
-    const { id } = req.params;
-    const { text, paragraphId } = req.body.article;
-
-    models.Article.findOne({
-        where: {
-            id
-        }
-    }).then(article => {
-        article.set(`paragraphs.${paragraphId}.paragraph`, text);
-        article.save().then((article) => {
-            return res.json({article});
-        })
-    });
-});
-
 router.delete('/:id', permission('admin'), (req, res, next) => {
     const { id } = req.params;
 
@@ -122,7 +129,12 @@ router.delete('/:id', permission('admin'), (req, res, next) => {
             id: id,
             message: 'Successfully deleted suggestion'
         });
+    }).catch((err) => {
+        const error = new Error(`Can't delete suggestion: ${err}`);
+        error.status = 403;
+        return next(error);
     });
+
 });
 
 export default router;

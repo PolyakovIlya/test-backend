@@ -25,6 +25,10 @@ router.get('/user/:id', (req, res, next) => {
 router.get('/users', (req, res, next) => {
     models.User.findAll().then((users) => {
         res.json(users);
+    }).catch((err) => {
+        const error = new Error(`Can't get all users: ${err}`);
+        error.status = 403;
+        return next(error);
     });
 });
 

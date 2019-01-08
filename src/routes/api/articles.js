@@ -10,6 +10,10 @@ router.get('/', (req, res, next) => {
         order: [['createdAt', 'DESC']]
     }).then((articles) => {
         res.json(articles);
+    }).catch((err) => {
+        const error = new Error(`Can't get all articles: ${err}`);
+        error.status = 403;
+        return next(error);
     });
 });
 
@@ -22,6 +26,10 @@ router.get('/:id', (req, res, next) => {
         }
     }).then((article) => {
         res.json(article);
+    }).catch((err) => {
+        const error = new Error(`Can't get article by id: ${err}`);
+        error.status = 403;
+        return next(error);
     });
 });
 
@@ -31,8 +39,6 @@ router.post('/', permission('admin'), (req, res, next) => {
 
     parser.then((result) => {
         const data = parsePage(result);
-
-        console.log(data);
 
         models.Article.create(
             {
@@ -46,13 +52,14 @@ router.post('/', permission('admin'), (req, res, next) => {
                 res.json(article);
             })
             .catch((err) => {
-                res.sendStatus(403).json({
-                    success: false,
-                    message: err
-                });
+                const error = new Error(`Can't create article: ${err}`);
+                error.status = 403;
+                return next(error);
             });
     }).catch((err) => {
-        console.log(err);
+        const error = new Error(`Can't parse news article: ${err}`);
+        error.status = 403;
+        return next(error);
     });
 });
 
@@ -69,6 +76,10 @@ router.put('/:id', permission('admin'), (req, res, next) => {
         article.save().then((article) => {
             return res.json({article});
         })
+    }).catch((err) => {
+        const error = new Error(`Can't update article: ${err}`);
+        error.status = 403;
+        return next(error);
     });
 });
 
@@ -85,6 +96,10 @@ router.delete('/:id', (req, res, next) => {
             id: id,
             message: 'Successfully deleted article'
         });
+    }).catch((err) => {
+        const error = new Error(`Can't delete article: ${err}`);
+        error.status = 403;
+        return next(error);
     });
 });
 
