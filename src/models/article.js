@@ -32,7 +32,7 @@ class Article extends Model {
     }
 
     static associate(models) {
-        models.Article.hasMany(models.Suggestion);
+        models.Article.hasMany(models.Suggestion, { onDelete: 'cascade' });
     }
 }
 
