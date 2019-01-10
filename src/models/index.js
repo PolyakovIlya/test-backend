@@ -38,7 +38,7 @@ let models = Object.assign({}, ...fs.readdirSync(__dirname)
         };
     }));
 
-Object.values(models)
+_.values(models)
     .filter(model => typeof model.associate === "function")
     .forEach(model => model.associate(models));
 
