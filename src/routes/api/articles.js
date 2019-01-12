@@ -6,10 +6,28 @@ import permission from '../../middlewares/permission';
 const router = Router();
 
 router.get('/', (req, res, next) => {
-    models.Article.findAll({
+    let page = parseInt(req.query.page);
+    let limit = 3;
+    let offset = page * limit;
+
+    models.Article.findAndCountAll({
+        attributes: ['id', 'title', 'url', 'paragraphs', 'createdAt'],
+        limit: limit,
+        offset: offset - 1,
+        $sort: { id: 1 },
         order: [['createdAt', 'DESC']]
     }).then((articles) => {
-        res.json(articles);
+        let pages = Math.ceil(articles.count / limit);
+        offset = limit * (page - 1);
+
+        res.json({
+            articles: articles.rows,
+            meta: {
+                count: articles.count,
+                page: page,
+                pages: pages
+            }
+        });
     }).catch((err) => {
         const error = new Error(`Can't get all articles: ${err}`);
         error.status = 403;
