@@ -1,7 +1,7 @@
 ## Requirements
 
 Node js ver. 6-8 <br>
-Database: postgreSQL ver. 11.1 <br>
+Database: MySQL ver. 8.0.13 <br>
 
 ## Installation
 

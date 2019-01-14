@@ -2,9 +2,9 @@ import path from 'path';
 
 export default {
     // address of postegre
-    dburi: process.env.POSTGRESURI || 'localhost:5432',
-    dbname: 'postgres_db',
-    user: process.env.DB_USER || 'admin',
+    dburi: process.env.POSTGRESURI || 'localhost:3306',
+    dbname: 'article_db',
+    user: process.env.DB_USER || 'root',
     pass: process.env.DB_PASS || 'admin',
 
     // environment

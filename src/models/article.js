@@ -22,7 +22,7 @@ class Article extends Model {
                     field: 'url'
                 },
                 paragraphs: {
-                    type: DataTypes.JSONB,
+                    type: DataTypes.JSON,
                     allowNull: true,
                     field: 'paragraphs'
                 }

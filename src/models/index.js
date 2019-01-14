@@ -10,7 +10,7 @@ if (config.dbname === process.env.POSTGRESURI && !config.pass) logger.warn(`bad 
 
 const sequelize = new Sequelize(config.dbname, config.user, config.pass, {
     host: '127.0.0.1',
-    dialect: 'postgres',
+    dialect: 'mysql',
     operatorsAliases: false, // disable aliases
     pool: {
         max: 5,
