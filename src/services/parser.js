@@ -19,7 +19,7 @@ const parsePage = (data) => {
 
     let paragraphs = [];
 
-    let body = $('article .row .body-copy');
+    let body = $('article > .row .body-copy');
     $(body).find('p').each((i, el) => {
         let obj = {
             paragraph: $(el).text()

@@ -8,12 +8,12 @@ const router = Router();
 router.get('/', (req, res, next) => {
     let page = parseInt(req.query.page);
     let limit = 3;
-    let offset = page * limit;
+    let offset = limit * (page - 1);
 
     models.Article.findAndCountAll({
         attributes: ['id', 'title', 'url', 'paragraphs', 'createdAt'],
         limit: limit,
-        offset: offset - 1,
+        offset: offset,
         $sort: { id: 1 },
         order: [['createdAt', 'DESC']]
     }).then((articles) => {
