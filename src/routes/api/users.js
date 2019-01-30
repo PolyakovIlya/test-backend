@@ -17,7 +17,6 @@ router.get('/user/:id', (req, res, next) => {
         res.json(user);
     }).catch((err) => {
         const error = new Error(`Can't find required user: ${err}`);
-        error.status = 404;
         return next(error);
     });
 });
@@ -27,7 +26,6 @@ router.get('/users', (req, res, next) => {
         res.json(users);
     }).catch((err) => {
         const error = new Error(`Can't get all users: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
@@ -55,11 +53,9 @@ router.post('/users/login', (req, res, next) => {
         }
 
         const error = new Error('Incorrect username or password');
-        error.status = 422;
         return next(error);
     }).catch(() => {
         const error = new Error('Authentication failed! Please check the request');
-        error.status = 400;
         return next(error);
     });
 });
@@ -83,14 +79,12 @@ router.post('/users/register', (req, res, next) => {
 
         if (created) {
             res.json(userData);
+        } else {
+            const error = new Error('Can\'t create user');
+            return next(error);
         }
-
-        const error = new Error('Can\'t create user');
-        error.status = 400;
-        return next(error);
     }).catch(() => {
         const error = new Error('Can\'t find or create user');
-        error.status = 404;
         return next(error);
     });
 });

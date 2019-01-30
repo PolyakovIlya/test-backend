@@ -5,7 +5,6 @@ import config from '../config';
 export default (req, res, next) => {
     const token = req.body.token || req.params.token || req.headers['x-access-token'] || req.cookies.token;
 
-
     const excludeRoutes = ['/api/users/login', '/api/users/register', '/'];
 
     if (_.includes(excludeRoutes, req.path)) return next();
