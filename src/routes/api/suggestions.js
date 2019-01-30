@@ -11,7 +11,6 @@ router.get('/', permission('admin'), (req, res, next) => {
         res.json(suggestions);
     }).catch((err) => {
         const error = new Error(`Can't get all suggestions: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
@@ -27,7 +26,6 @@ router.get('/:articleId', permission('admin'), (req, res, next) => {
         res.json(suggestions);
     }).catch((err) => {
         const error = new Error(`Can't find suggestions by articleId: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
@@ -66,7 +64,6 @@ router.post('/', (req, res, next) => {
 
     }).catch((err) => {
         const error = new Error(`Can't create suggestion: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
@@ -111,7 +108,6 @@ router.put('/:id', permission('admin'), (req, res, next) => {
         })
         .catch((err) => {
             const error = new Error(`Can't update suggestion: ${err}`);
-            error.status = 403;
             return next(error);
         });
 });
@@ -131,7 +127,6 @@ router.delete('/:id', permission('admin'), (req, res, next) => {
         });
     }).catch((err) => {
         const error = new Error(`Can't delete suggestion: ${err}`);
-        error.status = 403;
         return next(error);
     });
 

@@ -30,7 +30,6 @@ router.get('/', (req, res, next) => {
         });
     }).catch((err) => {
         const error = new Error(`Can't get all articles: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
@@ -46,7 +45,6 @@ router.get('/:id', (req, res, next) => {
         res.json(article);
     }).catch((err) => {
         const error = new Error(`Can't get article by id: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
@@ -71,12 +69,10 @@ router.post('/', permission('admin'), (req, res, next) => {
             })
             .catch((err) => {
                 const error = new Error(`Can't create article: ${err}`);
-                error.status = 403;
                 return next(error);
             });
     }).catch((err) => {
         const error = new Error(`Can't parse news article: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
@@ -96,7 +92,6 @@ router.put('/:id', permission('admin'), (req, res, next) => {
         })
     }).catch((err) => {
         const error = new Error(`Can't update article: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
@@ -116,7 +111,6 @@ router.delete('/:id', (req, res, next) => {
         });
     }).catch((err) => {
         const error = new Error(`Can't delete article: ${err}`);
-        error.status = 403;
         return next(error);
     });
 });
