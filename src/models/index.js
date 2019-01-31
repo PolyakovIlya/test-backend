@@ -4,7 +4,11 @@ import path from 'path';
 import config from '../config/index';
 import logger from '../helpers/logger';
 
-mongoose.connect(`mongodb://${config.dburi}/${config.dbname}`, { useNewUrlParser: true })
+mongoose.connect(`mongodb://${config.dburi}/${config.dbname}`,
+    {
+        useNewUrlParser: true,
+        useCreateIndex: true
+    })
     .then(() => {
         logger.info('Database connection successful');
     })
@@ -16,7 +20,6 @@ let models = Object.assign({}, ...fs.readdirSync(__dirname)
     .filter(file => (file.indexOf('.') !== 0) && (file !== 'index.js'))
     .map((file) => {
         const model = require(path.join(__dirname, file)); // eslint-disable-line global-require
-        console.log(model);
         return {
             [model.default.name]: model
         };
