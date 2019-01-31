@@ -64,7 +64,7 @@ router.post('/users/register', (req, res, next) => {
     const salt = crypto.randomBytes(16).toString('hex');
     const password = crypto.pbkdf2Sync(req.body.user.password, salt, 10000, 32, 'sha512').toString('hex');
 
-    const user = new User({
+    const user = new models.User({
         email: req.body.user.email,
         salt,
         password,

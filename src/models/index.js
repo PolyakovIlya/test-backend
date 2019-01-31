@@ -3,22 +3,28 @@ import fs from 'fs';
 import path from 'path';
 import config from '../config/index';
 import logger from '../helpers/logger';
-import _ from 'lodash';
 
-class Database {
-    constructor() {
-        this._connect()
-    }
+mongoose.connect(`mongodb://${config.dburi}/${config.dbname}`, { useNewUrlParser: true })
+    .then(() => {
+        logger.info('Database connection successful');
+    })
+    .catch(err => {
+        logger.warn('Database connection error');
+    });
 
-    _connect() {
-        mongoose.connect(`mongodb://${config.dburi}/${config.dbname}`)
-            .then(() => {
-                logger.info('Database connection successful');
-            })
-            .catch(err => {
-                logger.warn('Database connection error');
-            })
-    }
-}
+let models = Object.assign({}, ...fs.readdirSync(__dirname)
+    .filter(file => (file.indexOf('.') !== 0) && (file !== 'index.js'))
+    .map((file) => {
+        const model = require(path.join(__dirname, file)); // eslint-disable-line global-require
+        console.log(model);
+        return {
+            [model.default.name]: model
+        };
+    }));
 
-module.exports = new Database();
+const db = {
+    ...models,
+    mongoose
+};
+
+module.exports = db;
