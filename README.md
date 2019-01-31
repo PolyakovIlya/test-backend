@@ -1,7 +1,7 @@
 ## Requirements
 
 Node js ver. 6-8 <br>
-Database: MySQL ver. 8.0.13 <br>
+Database: MongoDB ver. 4.0.4_1 <br>
 
 ## Installation
 

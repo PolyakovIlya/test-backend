@@ -1,40 +1,13 @@
-import { Model, DataTypes } from 'sequelize';
+import mongoose, { Schema } from 'mongoose';
 
-class Suggestion extends Model {
-    static init(sequelize) {
-        return super.init(
-            {
-                id: {
-                    type: DataTypes.INTEGER,
-                    primaryKey: true,
-                    autoIncrement: true,
-                    allowNull: false,
-                    field: 'id'
-                },
-                text: {
-                    type: DataTypes.TEXT,
-                    allowNull: true,
-                    field: 'text'
-                },
-                status: {
-                    type: DataTypes.ENUM('pending', 'approved', 'declined'),
-                    allowNull: true,
-                    defaultValue: 'pending',
-                    field: 'status'
-                },
-                paragraph_id: {
-                    type: DataTypes.INTEGER,
-                    allowNull: true,
-                    field: 'paragraph_id'
-                }
-            },
-            { sequelize }
-        );
+const suggestionSchema = new Schema ({
+    text: String,
+    status: {
+        type: String,
+        enum: ['pending', 'approved', 'declined'],
+        createdAt: Date,
+        updatedAt: Date
     }
+});
 
-    static associate(models) {
-        models.Suggestion.belongsTo(models.Article);
-    }
-}
-
-export default Suggestion;
+export default mongoose.model('Suggestion', suggestionSchema);

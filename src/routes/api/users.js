@@ -64,29 +64,28 @@ router.post('/users/register', (req, res, next) => {
     const salt = crypto.randomBytes(16).toString('hex');
     const password = crypto.pbkdf2Sync(req.body.user.password, salt, 10000, 32, 'sha512').toString('hex');
 
-    models.User.findOrCreate({
-        where: { username: req.body.user.username },
-
-        defaults: {
-            email: req.body.user.email,
-            salt,
-            password,
-            isAdmin: req.body.user.isAdmin
-        }
-    }).then((user) => {
-        const created = user[1];
-        const userData = user[0];
-
-        if (created) {
-            res.json(userData);
-        } else {
-            const error = new Error('Can\'t create user');
-            return next(error);
-        }
-    }).catch(() => {
-        const error = new Error('Can\'t find or create user');
-        return next(error);
+    const user = new User({
+        email: req.body.user.email,
+        salt,
+        password,
+        isAdmin: req.body.user.isAdmin
     });
+
+    user.save()
+        .then((user) => {
+            const created = user[1];
+            const userData = user[0];
+
+            if (created) {
+                res.json(userData);
+            } else {
+                const error = new Error('Can\'t create user');
+                return next(error);
+            }
+        }).catch(() => {
+            const error = new Error('Can\'t find or create user');
+            return next(error);
+        });
 });
 
 export default router;
