@@ -16,17 +16,21 @@ router.get('/', (req, res, next) => {
         .skip(offset)
         .exec()
         .then((articles) => {
-            let pages = Math.ceil(articles.count / limit);
-            offset = limit * (page - 1);
+            models.Article.countDocuments()
+                .exec()
+                .then(count => {
+                    let pages = Math.ceil(count / limit);
+                    offset = limit * (page - 1);
 
-            res.json({
-                articles,
-                meta: {
-                    count: articles.length,
-                    page: page,
-                    pages: pages
-                }
-            });
+                    res.json({
+                        articles,
+                        meta: {
+                            count,
+                            page,
+                            pages
+                        }
+                    });
+                })
         }).catch((err) => {
             const error = new Error(`Can't get all articles: ${err}`);
             return next(error);
