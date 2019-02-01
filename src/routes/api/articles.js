@@ -94,7 +94,7 @@ router.put('/:id', permission('admin'), (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
     const { id } = req.params;
 
-    models.Article.findByIdAndRemove(id).then(() => {
+    models.Article.findOneAndDelete(id).then(() => {
         res.status(200).json({
             id: id,
             message: 'Successfully deleted article'
