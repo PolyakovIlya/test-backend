@@ -65,22 +65,16 @@ router.put('/:id', permission('admin'), (req, res, next) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    models.Suggestion.update(
+    models.Suggestion.findOneAndUpdate(
         {
-            status: status
+            _id: id
         },
         {
-            where: {id: id},
-            returning: true,
-            plain: true
-        }).then((result) => {
-            const suggestion = result[1].dataValues;
-
-            models.Article.findOne({
-                where: {
-                    id: suggestion.ArticleId
-                }
-            }).then(article => {
+            status
+        },
+        { new: true }
+        ).then((suggestion) => {
+            models.Article.findById(suggestion.articleId).then(article => {
                 if(article && status === 'approved') {
                     article.set(`paragraphs.${suggestion.paragraph_id}.paragraph`, suggestion.text);
                     article.save().then(() => {
