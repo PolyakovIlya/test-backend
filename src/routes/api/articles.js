@@ -62,8 +62,7 @@ router.post('/', permission('admin'), (req, res, next) => {
         });
 
         article.save()
-            .then((result) => {
-                const article = result.get({ plain: true });
+            .then((article) => {
                 res.json(article);
             })
             .catch((err) => {
