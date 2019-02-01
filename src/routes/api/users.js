@@ -9,11 +9,7 @@ const router = Router();
 router.get('/user/:id', (req, res, next) => {
     const { id } = req.params;
 
-    models.User.findOne({
-        where: {
-            id
-        }
-    }).then((user) => {
+    models.User.findById(id).then((user) => {
         res.json(user);
     }).catch((err) => {
         const error = new Error(`Can't find required user: ${err}`);
@@ -22,7 +18,7 @@ router.get('/user/:id', (req, res, next) => {
 });
 
 router.get('/users', (req, res, next) => {
-    models.User.findAll().then((users) => {
+    models.User.find().then((users) => {
         res.json(users);
     }).catch((err) => {
         const error = new Error(`Can't get all users: ${err}`);
@@ -34,9 +30,7 @@ router.post('/users/login', (req, res, next) => {
     const { username, password } = req.body.user;
 
     models.User.findOne({
-        where: {
-            username
-        }
+        username: username
     }).then((user) => {
         // compare password
         const hash = crypto.pbkdf2Sync(password, user.salt, 10000, 32, 'sha512').toString('hex');
@@ -61,14 +55,17 @@ router.post('/users/login', (req, res, next) => {
 });
 
 router.post('/users/register', (req, res, next) => {
+    const { username, email, isAdmin } = req.body.user;
+
     const salt = crypto.randomBytes(16).toString('hex');
     const password = crypto.pbkdf2Sync(req.body.user.password, salt, 10000, 32, 'sha512').toString('hex');
 
     const user = new models.User({
-        email: req.body.user.email,
+        username,
+        email,
         salt,
         password,
-        isAdmin: req.body.user.isAdmin
+        isAdmin
     });
 
     user.save()

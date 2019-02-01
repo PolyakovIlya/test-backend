@@ -10,13 +10,19 @@ const userSchema = new Schema ({
         lowercase: true,
         validate: (value) => (
             validator.isEmail(value)
-        ),
-        createdAt: Date,
-        updatedAt: Date
+        )
     },
     password: String,
     salt: String,
-    isAdmin: Boolean
+    isAdmin: Boolean,
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now()
+    }
 });
 
 export default mongoose.model('User', userSchema);
