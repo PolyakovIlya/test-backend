@@ -73,11 +73,8 @@ router.post('/users/register', (req, res, next) => {
 
     user.save()
         .then((user) => {
-            const created = user[1];
-            const userData = user[0];
-
-            if (created) {
-                res.json(userData);
+            if (user) {
+                res.json(user);
             } else {
                 const error = new Error('Can\'t create user');
                 return next(error);

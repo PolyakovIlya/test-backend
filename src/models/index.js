@@ -21,9 +21,11 @@ let models = Object.assign({}, ...fs.readdirSync(__dirname)
     .map((file) => {
         const model = require(path.join(__dirname, file)); // eslint-disable-line global-require
         return {
-            [model.default.name]: model
+            [model.default.modelName]: model.default
         };
     }));
+
+// console.log(models.User)
 
 const db = {
     ...models,
