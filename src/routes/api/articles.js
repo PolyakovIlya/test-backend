@@ -55,20 +55,16 @@ router.post('/', permission('admin'), (req, res, next) => {
     parser.then((result) => {
         const data = parsePage(result);
 
-        const article = new models.Article({
+        models.Article.create({
             title: data.header,
             url,
             paragraphs: data.paragraphs
+        }).then(article => {
+            res.json(article);
+        }).catch((err) => {
+            const error = new Error(`Can't create article: ${err}`);
+            return next(error);
         });
-
-        article.save()
-            .then((article) => {
-                res.json(article);
-            })
-            .catch((err) => {
-                const error = new Error(`Can't create article: ${err}`);
-                return next(error);
-            });
     }).catch((err) => {
         const error = new Error(`Can't parse news article: ${err}`);
         return next(error);

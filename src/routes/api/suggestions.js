@@ -5,29 +5,28 @@ import permission from '../../middlewares/permission'
 const router = Router();
 
 router.get('/', permission('admin'), (req, res, next) => {
-    models.Suggestion.findAll({
-        order: [['createdAt', 'DESC']]
-    }).then((suggestions) => {
-        res.json(suggestions);
-    }).catch((err) => {
-        const error = new Error(`Can't get all suggestions: ${err}`);
-        return next(error);
-    });
+    models.Suggestion.find()
+        .sort({createdAt: 'desc'})
+        .exec()
+        .then((suggestions) => {
+            res.json(suggestions);
+        }).catch((err) => {
+            const error = new Error(`Can't get all suggestions: ${err}`);
+            return next(error);
+        });
 });
 
 router.get('/:articleId', permission('admin'), (req, res, next) => {
     const { articleId } = req.params;
 
-    models.Suggestion.findAll({
-        where: {
-            ArticleId: articleId
-        }
+    models.Suggestion.find({
+        articleId
     }).then((suggestions) => {
-        res.json(suggestions);
-    }).catch((err) => {
-        const error = new Error(`Can't find suggestions by articleId: ${err}`);
-        return next(error);
-    });
+            res.json(suggestions);
+        }).catch((err) => {
+            const error = new Error(`Can't find suggestions by articleId: ${err}`);
+            return next(error);
+        });
 });
 
 router.post('/', (req, res, next) => {
@@ -37,25 +36,19 @@ router.post('/', (req, res, next) => {
         text,
         paragraph_id: paragraphId,
         status,
-        ArticleId: articleId
+        articleId
     }).then((suggestion) => {
-        models.Article.findOne({
-            where: {
-                id: suggestion.ArticleId
-            }
-        }).then(article => {
+        models.Article.findById(articleId).then(article => {
             if(article && status === 'approved') {
                 article.set(`paragraphs.${suggestion.paragraph_id}.paragraph`, suggestion.text);
                 article.save().then(() => {
-                    return res.json({
-                        status: 200,
+                    return res.status(200).json({
                         suggestion,
                         message: 'Successfully created suggestion and article'
                     });
                 })
             } else {
-                return res.json({
-                    status: 200,
+                return res.status(200).json({
                     suggestion,
                     message: 'Successfully created suggestion'
                 });
@@ -91,15 +84,13 @@ router.put('/:id', permission('admin'), (req, res, next) => {
                 if(article && status === 'approved') {
                     article.set(`paragraphs.${suggestion.paragraph_id}.paragraph`, suggestion.text);
                     article.save().then(() => {
-                        return res.json({
-                            status: 200,
+                        return res.status(200).json({
                             data: suggestion,
                             message: 'Successfully updated suggestion and article'
                         });
                     })
                 } else {
-                    return res.json({
-                        status: 200,
+                    return res.status(200).json({
                         data: suggestion,
                         message: 'Successfully updated suggestion'
                     });
@@ -115,13 +106,8 @@ router.put('/:id', permission('admin'), (req, res, next) => {
 router.delete('/:id', permission('admin'), (req, res, next) => {
     const { id } = req.params;
 
-    models.Suggestion.destroy({
-        where: {
-            id: id
-        }
-    }).then(() => {
-        res.json({
-            status: 200,
+    models.Suggestion.findOneAndDelete(id).then(() => {
+        res.status(200).json({
             id: id,
             message: 'Successfully deleted suggestion'
         });
