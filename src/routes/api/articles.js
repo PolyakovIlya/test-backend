@@ -10,38 +10,33 @@ router.get('/', (req, res, next) => {
     let limit = 3;
     let offset = limit * (page - 1);
 
-    models.Article.findAndCountAll({
-        attributes: ['id', 'title', 'url', 'paragraphs', 'createdAt'],
-        limit: limit,
-        offset: offset,
-        $sort: { id: 1 },
-        order: [['createdAt', 'DESC']]
-    }).then((articles) => {
-        let pages = Math.ceil(articles.count / limit);
-        offset = limit * (page - 1);
+    models.Article.find()
+        .sort({createdAt: 'desc'})
+        .limit(limit)
+        .skip(offset)
+        .exec()
+        .then((articles) => {
+            let pages = Math.ceil(articles.count / limit);
+            offset = limit * (page - 1);
 
-        res.json({
-            articles: articles.rows,
-            meta: {
-                count: articles.count,
-                page: page,
-                pages: pages
-            }
+            res.json({
+                articles,
+                meta: {
+                    count: articles.length,
+                    page: page,
+                    pages: pages
+                }
+            });
+        }).catch((err) => {
+            const error = new Error(`Can't get all articles: ${err}`);
+            return next(error);
         });
-    }).catch((err) => {
-        const error = new Error(`Can't get all articles: ${err}`);
-        return next(error);
-    });
 });
 
 router.get('/:id', (req, res, next) => {
     const { id } = req.params;
 
-    models.Article.findOne({
-        where: {
-            id
-        }
-    }).then((article) => {
+    models.Article.findById(id).then((article) => {
         res.json(article);
     }).catch((err) => {
         const error = new Error(`Can't get article by id: ${err}`);
@@ -56,13 +51,13 @@ router.post('/', permission('admin'), (req, res, next) => {
     parser.then((result) => {
         const data = parsePage(result);
 
-        models.Article.create(
-            {
-                title: data.header,
-                url,
-                paragraphs: data.paragraphs
-            }
-        )
+        const article = new models.Article({
+            title: data.header,
+            url,
+            paragraphs: data.paragraphs
+        });
+
+        article.save()
             .then((result) => {
                 const article = result.get({ plain: true });
                 res.json(article);
@@ -81,11 +76,7 @@ router.put('/:id', permission('admin'), (req, res, next) => {
     const { id } = req.params;
     const { text, paragraphId } = req.body.article;
 
-    models.Article.findOne({
-        where: {
-            id
-        }
-    }).then(article => {
+    models.Article.findById(id).then(article => {
         article.set(`paragraphs.${paragraphId}.paragraph`, text);
         article.save().then((article) => {
             return res.json({article});
@@ -99,13 +90,8 @@ router.put('/:id', permission('admin'), (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
     const { id } = req.params;
 
-    models.Article.destroy({
-        where: {
-            id: id
-        }
-    }).then(() => {
-        res.json({
-            status: 200,
+    models.Article.findByIdAndRemove(id).then(() => {
+        res.status(200).json({
             id: id,
             message: 'Successfully deleted article'
         });
