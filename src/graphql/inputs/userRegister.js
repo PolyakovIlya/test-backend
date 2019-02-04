@@ -9,7 +9,6 @@ export default new GraphQLInputObjectType({
     fields: () => ({
         username: { type: GraphQLString },
         email: { type: GraphQLString },
-        salt: { type: GraphQLString },
         password: { type: GraphQLString },
         isAdmin: { type: GraphQLBoolean }
     })

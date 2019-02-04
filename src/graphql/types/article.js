@@ -6,6 +6,7 @@ import {
 } from 'graphql';
 
 import Suggestion from './suggestion'
+import Pagination from './pagination'
 import models from '../../models';
 
 

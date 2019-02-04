@@ -10,20 +10,19 @@ export default {
             type: UserRegisterInput
         }
     },
-    resolve (source, args) {
-        const { username, email, password, isAdmin } = args;
+    async resolve (source, args) {
+        const { username, email, password, isAdmin } = args.user;
 
         const salt = crypto.randomBytes(16).toString('hex');
+
         const cryptPassword = crypto.pbkdf2Sync(password, salt, 10000, 32, 'sha512').toString('hex');
 
-        return (
-            models.User.create({
-                username,
-                email,
-                salt,
-                password: cryptPassword,
-                isAdmin
-            })
-        );
+        return await models.User.create({
+            username,
+            email,
+            salt,
+            password: cryptPassword,
+            isAdmin
+        });
     }
 }
