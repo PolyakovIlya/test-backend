@@ -75,7 +75,7 @@ router.post('/users/register', async (req, res, next) => {
             const error = new Error('Can\'t create user');
             next(error);
         }
-    } catch(e) {
+    } catch(err) {
         const error = new Error('Can\'t find or create user');
         next(error);
     }

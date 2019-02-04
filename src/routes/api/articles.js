@@ -5,85 +5,84 @@ import permission from '../../middlewares/permission';
 
 const router = Router();
 
-router.get('/', (req, res, next) => {
-    let page = parseInt(req.query.page);
-    let limit = 3;
-    let offset = limit * (page - 1);
+router.get('/', async (req, res, next) => {
+    try {
+        let page = parseInt(req.query.page);
+        let limit = 3;
+        let offset = limit * (page - 1);
 
-    models.Article.find()
-        .sort({createdAt: 'desc'})
-        .limit(limit)
-        .skip(offset)
-        .exec()
-        .then((articles) => {
-            models.Article.countDocuments()
-                .exec()
-                .then(count => {
-                    let pages = Math.ceil(count / limit);
-                    offset = limit * (page - 1);
+        const articles = await models.Article.find()
+            .sort({createdAt: 'desc'})
+            .limit(limit)
+            .skip(offset)
+            .exec();
 
-                    res.json({
-                        articles,
-                        meta: {
-                            count,
-                            page,
-                            pages
-                        }
-                    });
-                })
-        }).catch((err) => {
-            const error = new Error(`Can't get all articles: ${err}`);
-            return next(error);
+        const count = await models.Article.countDocuments().exec();
+
+        let pages = Math.ceil(count / limit);
+
+        res.json({
+            articles,
+            meta: {
+                count,
+                page,
+                pages
+            }
         });
+    } catch (err) {
+        const error = new Error(`Can't get all articles: ${err}`);
+        next(error);
+    }
 });
 
-router.get('/:id', (req, res, next) => {
-    const { id } = req.params;
+router.get('/:id', async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const article = await models.Article.findById(id);
 
-    models.Article.findById(id).then((article) => {
         res.json(article);
-    }).catch((err) => {
+    } catch (err) {
         const error = new Error(`Can't get article by id: ${err}`);
-        return next(error);
-    });
+        next(error);
+    }
 });
 
-router.post('/', permission('admin'), (req, res, next) => {
-    const { url } = req.body.article;
-    const parser = init(url);
+router.post('/', permission('admin'), async (req, res, next) => {
+    try {
+        const { url } = req.body.article;
+        const result = await init(url);
 
-    parser.then((result) => {
         const data = parsePage(result);
 
-        models.Article.create({
+        const article = await models.Article.create({
             title: data.header,
             url,
             paragraphs: data.paragraphs
-        }).then(article => {
-            res.json(article);
-        }).catch((err) => {
-            const error = new Error(`Can't create article: ${err}`);
-            return next(error);
         });
-    }).catch((err) => {
+
+        res.json(article);
+    } catch (err) {
         const error = new Error(`Can't parse news article: ${err}`);
-        return next(error);
-    });
+        next(error);
+    }
 });
 
-router.put('/:id', permission('admin'), (req, res, next) => {
-    const { id } = req.params;
-    const { text, paragraphId } = req.body.article;
+router.put('/:id', permission('admin'), async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { text, paragraphId } = req.body.article;
 
-    models.Article.findById(id).then(article => {
-        article.set(`paragraphs.${paragraphId}.paragraph`, text);
-        article.save().then((article) => {
-            return res.json({article});
-        })
-    }).catch((err) => {
+        const articleById = await models.Article.findById(id);
+
+        articleById.set(`paragraphs.${paragraphId}.paragraph`, text);
+        const article = await articleById.save();
+
+        res.json({article});
+
+    } catch (err) {
         const error = new Error(`Can't update article: ${err}`);
-        return next(error);
-    });
+        next(error);
+    }
 });
 
 router.delete('/:id', (req, res, next) => {
@@ -96,7 +95,7 @@ router.delete('/:id', (req, res, next) => {
         });
     }).catch((err) => {
         const error = new Error(`Can't delete article: ${err}`);
-        return next(error);
+        next(error);
     });
 });
 
