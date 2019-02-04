@@ -5,8 +5,10 @@ import compress from 'compression';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import cors from 'cors';
+import graphqlHTTP from 'express-graphql';
 
 import middlewares from './middlewares';
+import schema from './graphql'
 import routes from './routes/index';
 
 import config from './config/index';
@@ -22,10 +24,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(compress());
 app.use(cookieParser());
 app.use(helmet());
-app.use(middlewares);
+// app.use(middlewares);
 // app.use(models);
 // set all routes
-app.use('/', routes);
+// app.use('/', routes);
+
+app.use('/graphql', graphqlHTTP({
+    schema,
+    pretty: true,
+    graphiql: true
+}));
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
